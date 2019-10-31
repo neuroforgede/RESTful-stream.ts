@@ -100,3 +100,7 @@ for await(const elem1 of iterate(parse(ctrlGen('https://url.to.rest.api/type1', 
     }
 }
 ```
+
+If you like this project, consider leaving a star on the repository at [GitHub](https://github.com/neuroforgede/RESTful-stream.ts).
+
+Proudly made by [NeuroForge](https://neuroforge.de/) in Bayreuth, Germany.
