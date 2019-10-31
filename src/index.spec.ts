@@ -3,22 +3,18 @@ import * as _ from 'lodash';
 
 function pages(pageCount: number) {
     const ret: Control<number, string> = {
-        hasNext(page: number | null) {
-            if(page != null) {
-                return page < (pageCount - 1);
-            } else {
-                return pageCount > 0;
-            }
+        hasNext(page: number) {
+            return page < (pageCount - 1);
         },
-        next(page: number | null) {
-            if(page != null) {
-                return Promise.resolve(page + 1);
-            } else {
-                return Promise.resolve(0);
-            }
+        next(page: number) {
+            return Promise.resolve(page + 1);
         },
         parse(page: number) {
-            return Promise.resolve(_.repeat(`${page}`, 10).split(''));
+            if(page == pageCount) {
+                return Promise.resolve([]);
+            } else {
+                return Promise.resolve(_.repeat(`${page}`, 10).split(''));
+            }
         }
     };
     return ret;
@@ -28,7 +24,7 @@ describe('test lazy loading list', () => {
     const tenPages = pages(10);
 
     it('test 10 pages with next', () => {        
-        return parse(tenPages).then(async listChunk => {
+        return parse(tenPages, 0).then(async listChunk => {
             let curChunk: ListChunk<string> | null = listChunk;
             let page = 0;
             while(page < 10) {
@@ -50,7 +46,7 @@ describe('test lazy loading list', () => {
     });
 
     it('test 10 pages as lazy stream', () => {
-        return parse(tenPages).then(async listChunk => {
+        return parse(tenPages, 0).then(async listChunk => {
             const expected = _.flatten(_.map([0,1,2,3,4,5,6,7,8,9], page => _.repeat(`${page}`, 10).split('')));
             let idx = 0;
             for await(const elem of listChunk.untilEnd()) {
@@ -65,7 +61,7 @@ describe('test lazy loading list', () => {
 
 describe('edge cases', () => {
     it('empty list', () => {
-        return parse(pages(0)).then(async listChunk => {
+        return parse(pages(0), 0).then(async listChunk => {
             expect(listChunk.elements).toEqual([]);
             expect(listChunk.next).toEqual(null);
 
