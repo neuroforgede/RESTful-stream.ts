@@ -57,9 +57,7 @@ const ctrl: Control<PageType, DataType> = {
     }
 };
 
-const startChunk = await parse(ctrl);
-
-for await(const elem of startChunk.untilEnd()) {
+for await(const elem of iterate(parse(ctrl))) {
     // do stuff with element
 }
 ```
