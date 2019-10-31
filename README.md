@@ -62,7 +62,7 @@ for await(const elem of iterate(parse(ctrl))) {
 }
 ```
 
-We can now even go further and define a utility method `ctrlGen` specific to our REST API:
+We can even go further and define a utility method `ctrlGen` specific to our REST API:
 
 ```typescript
 type PageType = // generic PageType for our API
@@ -81,7 +81,7 @@ function ctrlGen<DataType>(initialLink: string, parseFn: (page: PageType) => Pro
 };
 ```
 
-We now only have to define the parse function for each Entity type, and can then use it:
+This allows us to define the parse function for each Entity type, and can then use it:
 
 ```typescript
 function parse1(page: PageType): Promise<Type1> {
