@@ -1,5 +1,6 @@
 import { parse, Control, ListChunk } from "../lib/index"
 import * as _ from 'lodash';
+import { iterate } from "../lib/implementation";
 
 function pages(pageCount: number) {
     const ret: Control<number, string> = {
@@ -55,6 +56,36 @@ describe('test lazy loading list', () => {
             }
             expect(idx).toEqual(100);
         })
+    });
+
+    it('test iterate flat object as first page', async () => {
+        const expected = _.flatten(_.map([0,1,2,3,4,5,6,7,8,9], page => _.repeat(`${page}`, 10).split('')));
+        let idx = 0;
+        for await(const elem of iterate(parse(tenPages, 0))) {
+            expect(elem).toEqual(expected[idx]);
+            idx = idx + 1;
+        }
+        expect(idx).toEqual(100);
+    });
+
+    it('test iterate Promise object as first page', async () => {
+        const expected = _.flatten(_.map([0,1,2,3,4,5,6,7,8,9], page => _.repeat(`${page}`, 10).split('')));
+        let idx = 0;
+        for await(const elem of iterate(parse(tenPages, Promise.resolve(0)))) {
+            expect(elem).toEqual(expected[idx]);
+            idx = idx + 1;
+        }
+        expect(idx).toEqual(100);
+    });
+
+    it('test iterate Promise closure as first page', async () => {
+        const expected = _.flatten(_.map([0,1,2,3,4,5,6,7,8,9], page => _.repeat(`${page}`, 10).split('')));
+        let idx = 0;
+        for await(const elem of iterate(parse(tenPages, () => Promise.resolve(0)))) {
+            expect(elem).toEqual(expected[idx]);
+            idx = idx + 1;
+        }
+        expect(idx).toEqual(100);
     });
 
 });
