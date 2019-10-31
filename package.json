@@ -24,8 +24,8 @@
     "url": "git+https://github.com/neuroforgede/RESTful-stream.ts.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "NeuroForge GmbH & Co. KG",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/neuroforgede/RESTful-stream.ts/issues"
   },
