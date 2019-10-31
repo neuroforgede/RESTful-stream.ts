@@ -1,6 +1,6 @@
 {
   "name": "restful-stream",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -23,7 +23,7 @@
     "type": "git",
     "url": "git+https://github.com/neuroforgede/RESTful-stream.ts.git"
   },
-  "keywords": ["etl", "data", "import", "rest", "restful"],
+  "keywords": ["etl", "data", "import", "rest", "restful", "library", "typescript", "async", "generator", "iterator"],
   "author": "NeuroForge GmbH & Co. KG",
   "license": "MIT",
   "bugs": {
