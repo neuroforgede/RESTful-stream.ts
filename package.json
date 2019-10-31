@@ -1,12 +1,12 @@
 {
   "name": "restful-stream",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "description": "",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsc",
+    "build": "tsc --declaration",
     "test": "jest"
   },
   "jest": {

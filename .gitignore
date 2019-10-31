@@ -62,3 +62,5 @@ typings/
 
 lib/**/*.js
 src/**/*.js
+lib/**/*.d.ts
+src/**/*.d.ts

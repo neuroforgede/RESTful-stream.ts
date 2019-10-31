@@ -40,6 +40,6 @@ export async function parse<PageType, DataType>(control: Control<PageType, DataT
     return ret;
 }
 
-export async function* iterate<DataType>(parsed: Promise<ListChunk<DataType>>) {
-    return (await parsed).untilEnd();
+export async function* iterate<DataType>(parsed: Promise<ListChunk<DataType>>): AsyncIterableIterator<DataType> {
+    yield* (await parsed).untilEnd();
 }
