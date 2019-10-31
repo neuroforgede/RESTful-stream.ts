@@ -4,16 +4,16 @@ This repository contains a small library function that allows to convert paginat
 This is particularly useful if you want to consume paginated REST apis in e.g. a nodejs program. Given two methods:
 
 ```typescript
-function queryInitial() {
-    //
+function queryInitial(): Promise<PageType> {
+    // use your asynchronous rest library of choice here
 }
 
-function querySubsequent(link: string) {
-    //
+function querySubsequent(link: string): Promise<PageType> {
+    // use your asynchronous rest library of choice here
 }
 
-function parse(obj: any) {
-    //
+function parseFn(obj: PageType): DataType {
+    // convert a JSON page into 
 }
 ```
 
@@ -23,7 +23,7 @@ instead of writing
 const page = await queryInitial();
 while(page) {
     // do stuff with page
-    const parsed = parse(page);
+    const parsed = await parseFn(page);
 
     for(elem in parsed) {
         // do stuff with element
@@ -40,6 +40,8 @@ we can now write:
 ```typescript
 type PageType = ...;
 type DataType = ...;
+
+const initialLink: string = // url to the initial link
 const ctrl: Control<PageType, DataType> = {
     hasNext(page: PageType) {
         return page.nextLink && page.nextLink != null;
@@ -48,7 +50,7 @@ const ctrl: Control<PageType, DataType> = {
         return querySubsequent(page.nextLink);
     },
     parse(page: PageType) {
-        return pase(page);
+        return parseFn(initialLink);
     }
 };
 
@@ -56,5 +58,44 @@ const startChunk = await parse(ctrl);
 
 for await(const elem of startChunk.untilEnd()) {
     // do stuff with element
+}
+```
+
+We can now even go further and define a utility method `ctrlGen` specific to our REST API:
+
+```typescript
+type PageType = // generic PageType for our API
+function ctrlGen<DataType>(initialLink: string, parseFn: (page: PageType) => Promise<DataType>) {
+    const ctrl: Control<PageType, DataType> = {
+        hasNext(page: PageType) {
+            return page.nextLink && page.nextLink != null;
+        },
+        next(page: PageType) {
+            return querySubsequent(page.initialLink);
+        },
+        parse(page: PageType) {
+            return parseFn(initialLink);
+        }
+    };
+};
+```
+
+We now only have to define the parse function for each Entity type, and can then use it:
+
+```typescript
+function parse1(page: PageType): Promise<Type1> {
+    const ret = ...;
+    return ret;
+}
+
+function parse2(page: PageType): Promise<Type1> {
+    const ret = ...;
+    return ret;
+}
+
+for await(const elem1 of parse(ctrlGen('https://url.to.rest.api/type1', parse1).untilEnd())) {
+    for await(const elem2 of parse(ctrlGen(`https://url.to.rest.api/${type1.id}/type2`, parse2).untilEnd())) {
+        // do stuff
+    }
 }
 ```
