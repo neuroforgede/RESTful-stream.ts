@@ -1,0 +1,14 @@
+version: '3.5'
+
+services:
+
+  restful_stream_ts_dev:
+    container_name: restful_stream_ts_dev
+    command: tail -f /dev/null
+    image: node:lts
+    volumes:
+      - ./:/usr/src/app
+    restart: unless-stopped
+    user: "1000:1000"
+ 
+networks: {}
