@@ -23,7 +23,7 @@
     "type": "git",
     "url": "git+https://github.com/neuroforgede/RESTful-stream.ts.git"
   },
-  "keywords": [],
+  "keywords": ["etl", "data", "import", "rest", "restful"],
   "author": "NeuroForge GmbH & Co. KG",
   "license": "MIT",
   "bugs": {

@@ -72,4 +72,4 @@ describe('edge cases', () => {
             expect(once).toBeFalsy();
         });
     });
-})
+});
