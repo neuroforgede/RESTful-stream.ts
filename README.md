@@ -96,8 +96,8 @@ function parse2(page: PageType): Promise<Type1> {
     return ret;
 }
 
-for await(const elem1 of iterate(ctrlGen('https://url.to.rest.api/type1', parse1))) {
-    for await(const elem2 of iterate(parse(ctrlGen(`https://url.to.rest.api/${type1.id}/type2`, parse2))) {
+for await(const elem1 of iterate(parse(ctrlGen('https://url.to.rest.api/type1', parse1)))) {
+    for await(const elem2 of iterate(parse(ctrlGen(`https://url.to.rest.api/${type1.id}/type2`, parse2)))) {
         // do stuff
     }
 }
