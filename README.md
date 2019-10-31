@@ -1,6 +1,9 @@
 # RESTful-stream.ts
 
-This repository contains a small library function that allows to convert paginated RESTful data into a `AsyncIterableIterator`.
+This repository contains a small library function that allows to convert paginated RESTful data into a `AsyncIterableIterator`
+which chunks the pages into memory as soon as they are requested (and caches them) and serves the elements on the page one by one
+in a stream.
+
 This is particularly useful if you want to consume paginated REST apis in e.g. a nodejs program. Given two methods:
 
 ```typescript
