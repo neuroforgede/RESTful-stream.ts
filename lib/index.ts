@@ -1,4 +1,3 @@
-import _ = require('lodash');
 import * as interfaces from './interfaces';
 import * as implementation from './implementation';
 
