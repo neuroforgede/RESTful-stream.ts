@@ -19,7 +19,13 @@ export interface Control<PageType, DataType> {
 
 type FirstPage<PageType> = (() => Promise<PageType>) | Promise<PageType> | PageType;
 
-export async function parse<PageType, DataType>(control: Control<PageType, DataType>, curPage: FirstPage<PageType>): Promise<ListChunk<DataType>> {
+export type ChunkedList<DataType> = () => Promise<ListChunk<DataType>>;
+
+export function parse<PageType, DataType>(control: Control<PageType, DataType>, curPage: FirstPage<PageType>): ChunkedList<DataType> {
+    return () => parseInternal(control, curPage);
+}
+
+async function parseInternal<PageType, DataType>(control: Control<PageType, DataType>, curPage: FirstPage<PageType>): Promise<ListChunk<DataType>> {
     let nextPromise: Promise<ListChunk<DataType>> | null = null;
     
     let _curPage: PageType;
@@ -33,7 +39,7 @@ export async function parse<PageType, DataType>(control: Control<PageType, DataT
     async function nextFn(): Promise<ListChunk<DataType>> {
         if (nextPromise == null) {
             const nextPage = await control.next(_curPage);
-            return parse(control, nextPage);
+            return await parseInternal(control, nextPage);
         } else {
             return nextPromise;
         }
@@ -50,6 +56,6 @@ export async function parse<PageType, DataType>(control: Control<PageType, DataT
     return ret;
 }
 
-export async function* iterate<DataType>(parsed: Promise<ListChunk<DataType>>): AsyncIterableIterator<DataType> {
-    yield* (await parsed).untilEnd();
+export async function* iterate<DataType>(parsed: ChunkedList<DataType>): AsyncIterableIterator<DataType> {
+    yield* (await parsed()).untilEnd();
 }

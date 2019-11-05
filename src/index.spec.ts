@@ -1,6 +1,7 @@
 import { parse, Control, ListChunk } from "../lib/index"
 import * as _ from 'lodash';
 import { iterate } from "../lib/implementation";
+import { promises } from "fs";
 
 function pages(pageCount: number) {
     const ret: Control<number, string> = {
@@ -25,7 +26,7 @@ describe('test lazy loading list', () => {
     const tenPages = pages(10);
 
     it('test 10 pages with next', () => {        
-        return parse(tenPages, 0).then(async listChunk => {
+        return parse(tenPages, 0)().then(async listChunk => {
             let curChunk: ListChunk<string> | null = listChunk;
             let page = 0;
             while(page < 10) {
@@ -47,7 +48,7 @@ describe('test lazy loading list', () => {
     });
 
     it('test 10 pages as lazy stream', () => {
-        return parse(tenPages, 0).then(async listChunk => {
+        return parse(tenPages, 0)().then(async listChunk => {
             const expected = _.flatten(_.map([0,1,2,3,4,5,6,7,8,9], page => _.repeat(`${page}`, 10).split('')));
             let idx = 0;
             for await(const elem of listChunk.untilEnd()) {
@@ -92,7 +93,7 @@ describe('test lazy loading list', () => {
 
 describe('edge cases', () => {
     it('empty list', () => {
-        return parse(pages(0), 0).then(async listChunk => {
+        return parse(pages(0), 0)().then(async listChunk => {
             expect(listChunk.elements).toEqual([]);
             expect(listChunk.next).toEqual(null);
 
@@ -104,3 +105,27 @@ describe('edge cases', () => {
         });
     });
 });
+
+describe('laziness', () => {
+    it('declaration should not evaluate', () => {
+        let evaluated = false;
+        const parsed = parse(pages(0), () => {
+            evaluated = true;
+            return Promise.resolve(0);
+        });
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if(evaluated) {
+                    reject();
+                } else {
+                    resolve();
+                }
+            }, 1000);
+        }).then(() => {
+            try {
+                iterate(parsed);
+                throw new Error('should have failed when iterate was called');
+            } catch {}
+        });
+    });
+})
