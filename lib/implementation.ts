@@ -19,9 +19,9 @@ export interface Control<PageType, DataType> {
 
 type FirstPage<PageType> = (() => Promise<PageType>) | Promise<PageType> | PageType;
 
-export type ChunkedList<DataType> = () => Promise<ListChunk<DataType>>;
+export type Parser<DataType> = () => Promise<ListChunk<DataType>>;
 
-export function parse<PageType, DataType>(control: Control<PageType, DataType>, curPage: FirstPage<PageType>): ChunkedList<DataType> {
+export function parse<PageType, DataType>(control: Control<PageType, DataType>, curPage: FirstPage<PageType>): Parser<DataType> {
     return () => parseInternal(control, curPage);
 }
 
@@ -56,6 +56,6 @@ async function parseInternal<PageType, DataType>(control: Control<PageType, Data
     return ret;
 }
 
-export async function* iterate<DataType>(parsed: ChunkedList<DataType>): AsyncIterableIterator<DataType> {
+export async function* iterate<DataType>(parsed: Parser<DataType>): AsyncIterableIterator<DataType> {
     yield* (await parsed()).untilEnd();
 }
