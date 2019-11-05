@@ -15,7 +15,7 @@ function querySubsequent(link: string): Promise<PageType> {
     // use your asynchronous rest library of choice here
 }
 
-function parseFn(obj: PageType): DataType {
+function parseFn(obj: PageType): Promise<DataType[]> {
     // convert a JSON page into 
 }
 ```
@@ -23,17 +23,19 @@ function parseFn(obj: PageType): DataType {
 instead of writing
 
 ```typescript
-const page = await queryInitial();
+let page = await queryInitial();
 while(page) {
     // do stuff with page
     const parsed = await parseFn(page);
 
-    for(elem in parsed) {
+    for(const elem of parsed) {
         // do stuff with element
     }
 
     if(page.nextLink && page.nextLink != null) {
         page = await querySubsequent(page.nextLink);
+    } else {
+        page = null;
     }
 }
 ```
