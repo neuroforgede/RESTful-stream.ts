@@ -1,5 +1,7 @@
+export type Parser<DataType> = () => Promise<ListChunk<DataType>>;
+
 export interface ListChunk<T> {
-    next: (() => Promise<ListChunk<T>>) | null,
+    next: Parser<T> | null,
     elements: T[],
     untilEnd: () => AsyncIterableIterator<T>
 }

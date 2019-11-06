@@ -1,13 +1,8 @@
-import { ListChunk } from './interfaces';
+import { ListChunk, Parser } from './interfaces';
 
-async function* emptyIterator<T>(): AsyncIterableIterator<T> { return [] }
-
-async function* untilEnd<T>(start: ListChunk<T>): AsyncIterableIterator<T> {
-    let cur: (() => Promise<ListChunk<T>>) | null = () => new Promise<ListChunk<T>>((resolve, reject) => resolve(start));
-    while (cur) {
-        const curAwaited: ListChunk<T> = await cur();
-        yield* curAwaited.elements;
-        cur = curAwaited.next;
+export async function* map<T, U>(input: AsyncIterableIterator<T>, mapFn: (item: T) => Promise<U>): AsyncIterableIterator<U> {
+    for await(const elem of input) {
+        yield mapFn(elem);
     }
 }
 
@@ -18,8 +13,6 @@ export interface Control<PageType, DataType> {
 }
 
 type FirstPage<PageType> = (() => Promise<PageType>) | Promise<PageType> | PageType;
-
-export type Parser<DataType> = () => Promise<ListChunk<DataType>>;
 
 export function parse<PageType, DataType>(control: Control<PageType, DataType>, curPage: FirstPage<PageType>): Parser<DataType> {
     return () => parseInternal(control, curPage);
@@ -51,11 +44,16 @@ async function parseInternal<PageType, DataType>(control: Control<PageType, Data
         elements: parsed,
         untilEnd: () => { throw new Error(); }
     };
-    ret.untilEnd = () => untilEnd(ret);
+    ret.untilEnd = () => iterate(() => Promise.resolve(ret));
 
     return ret;
 }
 
-export async function* iterate<DataType>(parsed: Parser<DataType>): AsyncIterableIterator<DataType> {
-    yield* (await parsed()).untilEnd();
+export async function* iterate<DataType>(parser: Parser<DataType>): AsyncIterableIterator<DataType> {
+    let cur: Parser<DataType> | null = parser;
+    while (cur) {
+        const curAwaited: ListChunk<DataType> = await cur();
+        yield* curAwaited.elements;
+        cur = curAwaited.next;
+    }
 }
